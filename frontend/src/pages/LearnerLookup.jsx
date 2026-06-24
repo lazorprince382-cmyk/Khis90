@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import PhotoPreview from '../components/PhotoPreview';
 import './LearnerLookup.css';
 
 const LOCATION_LABELS = {
@@ -210,7 +211,9 @@ export default function LearnerLookup() {
             <div className="profile-header">
               <div className="profile-avatar">
                 {selected.photo_url ? (
-                  <img src={selected.photo_url} alt="" />
+                  <PhotoPreview src={selected.photo_url} alt={`${selected.first_name} ${selected.last_name} profile photo`}>
+                    <img src={selected.photo_url} alt="" />
+                  </PhotoPreview>
                 ) : (
                   <>{selected.first_name[0]}{selected.last_name[0]}</>
                 )}

@@ -90,6 +90,8 @@ CREATE TABLE users (
     full_name VARCHAR(200) NOT NULL,
     role VARCHAR(50) DEFAULT 'staff',
     office_id UUID REFERENCES offices(id),
+    dashboard_access TEXT[] DEFAULT '{}',
+    notification_access TEXT[] DEFAULT '{}',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

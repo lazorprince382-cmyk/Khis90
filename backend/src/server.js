@@ -15,6 +15,8 @@ const createStaffRoutes = require('./routes/staff');
 const visitorRoutes = require('./routes/visitors');
 const reportRoutes = require('./routes/reports');
 const officeRoutes = require('./routes/offices');
+const createMessageRoutes = require('./routes/messages');
+const adminRoutes = require('./routes/admin');
 const { authenticate } = require('./middleware/auth');
 
 const app = express();
@@ -43,6 +45,8 @@ app.use('/api/staff', createStaffRoutes(io));
 app.use('/api/visitors', visitorRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/offices', officeRoutes);
+app.use('/api/messages', createMessageRoutes(io));
+app.use('/api/admin', adminRoutes);
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);

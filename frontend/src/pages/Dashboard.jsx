@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
+import PhotoPreview from '../components/PhotoPreview';
 import './Dashboard.css';
 
 const STAT_ICONS = {
@@ -99,7 +100,13 @@ export default function Dashboard() {
     const name = fullName(row);
     return (
       <div className="detail-learner-cell">
-        {row.photo_url ? <img src={row.photo_url} alt="" /> : <span>{name.split(' ').map((p) => p[0]).join('').slice(0, 2) || '?'}</span>}
+        {row.photo_url ? (
+          <PhotoPreview src={row.photo_url} alt={`${name} profile photo`}>
+            <img src={row.photo_url} alt="" />
+          </PhotoPreview>
+        ) : (
+          <span>{name.split(' ').map((p) => p[0]).join('').slice(0, 2) || '?'}</span>
+        )}
         <div>
           <strong>{name}</strong>
           <small>{row.registration_number || row.card_id}</small>
@@ -325,7 +332,13 @@ export default function Dashboard() {
               {recentScans.map((item) => (
                 <li key={item.id}>
                   <span className={`act-dot ${item.event_type?.includes('late') ? 'late' : item.event_type?.includes('out') ? 'out' : 'in'}`} />
-                  {item.photo_url ? <img className="act-photo" src={item.photo_url} alt="" /> : <span className="act-photo">{`${item.first_name?.[0] || ''}${item.last_name?.[0] || ''}` || '?'}</span>}
+                  {item.photo_url ? (
+                    <PhotoPreview src={item.photo_url} alt={`${item.first_name || ''} ${item.last_name || ''} profile photo`}>
+                      <img className="act-photo" src={item.photo_url} alt="" />
+                    </PhotoPreview>
+                  ) : (
+                    <span className="act-photo">{`${item.first_name?.[0] || ''}${item.last_name?.[0] || ''}` || '?'}</span>
+                  )}
                   <div>
                     <p>{item.message}</p>
                     <time>{item.first_name ? `${item.first_name} ${item.last_name} · ` : ''}{new Date(item.created_at).toLocaleString()}</time>
@@ -354,8 +367,8 @@ export default function Dashboard() {
           <p>Learners currently in school</p>
         </div>
         <div className="ui-card dash-mini-card">
-          <h3>Offices</h3>
-          <Link to="/office-dashboard" className="btn btn-primary btn-sm">Open Office Dashboard</Link>
+          <h3>Notifications</h3>
+          <Link to="/notifications" className="btn btn-primary btn-sm">Open Notifications</Link>
         </div>
       </div>
 

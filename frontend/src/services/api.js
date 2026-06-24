@@ -44,6 +44,33 @@ export const api = {
   getMe: () => request('/auth/me'),
   listUsers: () => request('/auth/users'),
   createUser: (data) => request('/auth/users', { method: 'POST', body: JSON.stringify(data) }),
+  updateUser: (id, data) => request(`/auth/users/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteUser: (id) => request(`/auth/users/${id}`, { method: 'DELETE' }),
+  resetUserPassword: (id, password) => request(`/auth/users/${id}/reset-password`, { method: 'POST', body: JSON.stringify({ password }) }),
+  changePassword: (current_password, new_password) => request('/auth/change-password', { method: 'POST', body: JSON.stringify({ current_password, new_password }) }),
+
+  listAuditLogs: () => request(`/admin/audit-logs?t=${Date.now()}`),
+  listSessions: () => request(`/admin/sessions?t=${Date.now()}`),
+  revokeSession: (id) => request(`/admin/sessions/${id}/revoke`, { method: 'PATCH' }),
+  listPermissionTemplates: () => request('/admin/permission-templates'),
+  createPermissionTemplate: (data) => request('/admin/permission-templates', { method: 'POST', body: JSON.stringify(data) }),
+  deletePermissionTemplate: (id) => request(`/admin/permission-templates/${id}`, { method: 'DELETE' }),
+  downloadBackup: () => {
+    const token = getToken();
+    window.open(`${API_BASE}/admin/backup?token=${token}`, '_blank');
+  },
+
+  listMessageContacts: () => request(`/messages/contacts?t=${Date.now()}`),
+  getConversation: (userId) => request(`/messages/conversation/${userId}?t=${Date.now()}`),
+  sendMessage: (recipient_id, body, attachment, isVoiceNote = false) => {
+    const form = new FormData();
+    form.append('recipient_id', recipient_id);
+    form.append('body', body || '');
+    form.append('is_voice_note', isVoiceNote ? 'true' : 'false');
+    if (attachment) form.append('attachment', attachment);
+    return request('/messages', { method: 'POST', body: form });
+  },
+  markConversationRead: (userId) => request(`/messages/conversation/${userId}/read`, { method: 'PATCH' }),
 
   listOffices: () => request('/offices'),
   createOffice: (data) => request('/offices', { method: 'POST', body: JSON.stringify(data) }),
@@ -56,7 +83,7 @@ export const api = {
     method: 'POST',
     body: data instanceof FormData ? data : JSON.stringify(data),
   }),
-  bulkImport: (learners) => request('/learners/bulk', { method: 'POST', body: JSON.stringify({ learners }) }),
+  bulkImport: (learners, file_name) => request('/learners/bulk', { method: 'POST', body: JSON.stringify({ learners, file_name }) }),
   uploadPhoto: (id, file) => {
     const form = new FormData();
     form.append('photo', file);
@@ -115,6 +142,11 @@ export const api = {
     if (date) params.set('date', date);
     if (class_name) params.set('class_name', class_name);
     return request(`/reports/attendance?${params}`);
+  },
+  getDailySummary: (date) => request(`/reports/daily-summary?date=${encodeURIComponent(date)}`),
+  exportDailyActivity: (date) => {
+    const token = getToken();
+    window.open(`${API_BASE}/reports/daily-activity/export?date=${encodeURIComponent(date)}&token=${token}`, '_blank');
   },
   exportAttendance: (date, class_name) => {
     const params = new URLSearchParams();

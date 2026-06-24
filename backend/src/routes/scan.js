@@ -6,14 +6,13 @@ const { authenticate, authorize } = require('../middleware/auth');
 module.exports = (io) => {
   router.post('/', authenticate, (req, res, next) => {
     const type = req.body.scan_type;
-    const permMap = {
-      gate_in: 'scan_gate', gate_out: 'scan_gate',
-      lunch: 'scan_lunch', library_in: 'scan_library', library_out: 'scan_library',
+    const pathMap = {
+      gate_in: '/scan/gate', gate_out: '/scan/gate',
+      lunch: '/scan/lunch', library_in: '/scan/library', library_out: '/scan/library',
     };
-    const perm = permMap[type];
-    const { ROLE_PERMISSIONS } = require('../middleware/auth');
-    const perms = ROLE_PERMISSIONS[req.user?.role] || [];
-    if (!perms.includes('*') && !perms.includes(perm)) {
+    const path = pathMap[type];
+    const access = req.user?.dashboard_access || [];
+    if (!access.includes('*') && !access.includes(path)) {
       return res.status(403).json({ error: 'Insufficient permissions for this scan type.' });
     }
     return processScan(req, res, io);

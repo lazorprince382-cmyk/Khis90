@@ -3,6 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import PhotoPreview from '../components/PhotoPreview';
 import './Notifications.css';
 
 const EVENT_ICONS = {
@@ -30,15 +31,12 @@ export default function Notifications() {
     });
 
     return () => socket.disconnect();
-  }, [user?.role, user?.office_id]);
+  }, [user?.role, user?.notification_access]);
 
   function canSeeNotification(notif) {
     if (user?.role === 'admin') return true;
-    if (user?.office_id) return notif.office_id === user.office_id;
-    if (user?.role === 'librarian') return ['library_in', 'library_out'].includes(notif.event_type);
-    if (user?.role === 'cafeteria') return notif.event_type === 'lunch';
-    if (user?.role === 'security') return ['gate_in', 'gate_out', 'late_arrival', 'early_departure'].includes(notif.event_type);
-    return true;
+    const allowed = user?.notification_access || [];
+    return allowed.includes('*') || allowed.includes(notif.event_type);
   }
 
   async function loadNotifications() {
@@ -69,12 +67,12 @@ export default function Notifications() {
     <div className="notifications-page">
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">Office Notifications</h2>
+          <h2 className="card-title">Dashboard Notifications</h2>
           <span className="notif-count">{notifications.length} total</span>
         </div>
 
         <p className="notif-description">
-          Real-time alerts sent to offices when learners scan their cards at the gate, cafeteria, or library.
+          Real-time alerts assigned to your account when learners scan cards or school activity is recorded.
         </p>
 
         {notifications.length === 0 ? (
@@ -93,7 +91,11 @@ export default function Notifications() {
                 <span className="notif-icon">{EVENT_ICONS[notif.event_type] || '📋'}</span>
                 {notif.learner_id && (
                   notif.photo_url
-                    ? <img className="notif-photo" src={notif.photo_url} alt="" />
+                    ? (
+                      <PhotoPreview src={notif.photo_url} alt={`${notif.first_name || ''} ${notif.last_name || ''} profile photo`}>
+                        <img className="notif-photo" src={notif.photo_url} alt="" />
+                      </PhotoPreview>
+                    )
                     : <span className="notif-photo">{`${notif.first_name?.[0] || ''}${notif.last_name?.[0] || ''}` || '?'}</span>
                 )}
                 <div className="notif-content">

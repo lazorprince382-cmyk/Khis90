@@ -20,6 +20,10 @@
   margin-left: -1px;
 }
 
+.sidebar-scrim {
+  display: none;
+}
+
 .sidebar-brand {
   background: var(--kis-maroon);
   color: #fff;
@@ -69,6 +73,12 @@
   transition: all 0.15s;
 }
 
+.sidebar-link svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .sidebar-link:hover {
   background: var(--kis-maroon-light);
   color: var(--kis-maroon);
@@ -91,6 +101,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidebar-badge.message-badge {
+  background: #22c55e;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
 }
 
 .sidebar-term-card {
@@ -246,7 +262,90 @@
 }
 
 @media (max-width: 900px) {
-  .app-sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; box-shadow: var(--shadow-lg); }
-  .app-sidebar.collapsed { width: 0; }
+  body.drawer-open {
+    overflow: hidden;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  .app-main {
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 120;
+    width: min(82vw, 280px);
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.28);
+    transform: translateX(0);
+    transition: transform 0.22s ease;
+  }
+
+  .app-sidebar.collapsed {
+    width: min(82vw, 280px);
+    margin-left: 0;
+    transform: translateX(-105%);
+  }
+
+  .sidebar-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 110;
+    border: 0;
+    background: rgba(15, 23, 42, 0.42);
+  }
+
+  .topbar {
+    gap: 0.55rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .topbar-menu {
+    flex-shrink: 0;
+  }
+
+  .topbar-search {
+    min-width: 0;
+    padding: 0.48rem 0.65rem;
+  }
+
   .topbar-search kbd { display: none; }
+
+  .topbar-user {
+    padding-left: 0.45rem;
+    gap: 0.45rem;
+  }
+
+  .topbar-user-name,
+  .topbar-user-role {
+    display: none;
+  }
+
+  .topbar-actions {
+    gap: 0.4rem;
+  }
+
+  .page-content {
+    padding: 1rem;
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar-search input {
+    max-width: 130px;
+  }
+
+  .topbar-icon-btn,
+  .topbar-avatar {
+    width: 36px;
+    height: 36px;
+  }
 }

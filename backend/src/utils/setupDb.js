@@ -28,6 +28,9 @@ async function setupDatabase() {
   const migrationPath = path.join(__dirname, '../../../database/migration_v2.sql');
   const migrationV3Path = path.join(__dirname, '../../../database/migration_v3.sql');
   const migrationV4Path = path.join(__dirname, '../../../database/migration_v4.sql');
+  const migrationV5Path = path.join(__dirname, '../../../database/migration_v5.sql');
+  const migrationV6Path = path.join(__dirname, '../../../database/migration_v6.sql');
+  const migrationV7Path = path.join(__dirname, '../../../database/migration_v7.sql');
 
   try {
     await pool.connect();
@@ -40,7 +43,7 @@ async function setupDatabase() {
       console.log('Base schema already exists, skipping.');
     }
 
-    for (const mig of [migrationPath, migrationV3Path, migrationV4Path]) {
+    for (const mig of [migrationPath, migrationV3Path, migrationV4Path, migrationV5Path, migrationV6Path, migrationV7Path]) {
       if (fs.existsSync(mig)) {
         await pool.query(fs.readFileSync(mig, 'utf8'));
         console.log(`Migration applied: ${path.basename(mig)}`);
@@ -51,12 +54,18 @@ async function setupDatabase() {
     const adminExists = await pool.query("SELECT 1 FROM users WHERE username = 'admin'");
     if (adminExists.rows.length === 0) {
       await pool.query(
-        `INSERT INTO users (username, password_hash, full_name, role) VALUES ('admin', $1, 'System Administrator', 'admin')`,
+        `INSERT INTO users (username, password_hash, full_name, role, dashboard_access, notification_access)
+         VALUES ('admin', $1, 'System Administrator', 'admin', ARRAY['*'], ARRAY['*'])`,
         [hash]
       );
       console.log('Default admin created (username: admin, password: admin123)');
     } else {
-      await pool.query('UPDATE users SET password_hash = $1 WHERE username = $2', [hash, 'admin']);
+      await pool.query(
+        `UPDATE users
+         SET password_hash = $1, dashboard_access = ARRAY['*'], notification_access = ARRAY['*']
+         WHERE username = $2`,
+        [hash, 'admin']
+      );
       console.log('Admin password reset to: admin123');
     }
 

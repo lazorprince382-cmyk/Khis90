@@ -3,15 +3,14 @@ const pool = require('../config/db');
 function notificationScope(req, params) {
   const filters = [];
   if (req.user?.role !== 'admin') {
-    if (req.user?.office_id) {
-      params.push(req.user.office_id);
-      filters.push(`n.office_id = $${params.length}`);
-    } else if (req.user?.role === 'librarian') {
-      filters.push(`n.event_type IN ('library_in', 'library_out')`);
-    } else if (req.user?.role === 'cafeteria') {
-      filters.push(`n.event_type = 'lunch'`);
-    } else if (req.user?.role === 'security') {
-      filters.push(`n.event_type IN ('gate_in', 'gate_out', 'late_arrival', 'early_departure')`);
+    const allowed = req.user?.notification_access || [];
+    if (!allowed.includes('*')) {
+      if (allowed.length === 0) {
+        filters.push('FALSE');
+      } else {
+        params.push(allowed);
+        filters.push(`n.event_type = ANY($${params.length})`);
+      }
     }
   }
   return filters;

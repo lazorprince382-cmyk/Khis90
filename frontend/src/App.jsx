@@ -22,6 +22,7 @@ const Visitors = lazy(pageLoaders.visitors);
 const StaffPage = lazy(pageLoaders.staff);
 const OfficeDashboard = lazy(pageLoaders.officeDashboard);
 const OfficeManagement = lazy(pageLoaders.offices);
+const Messages = lazy(pageLoaders.messages);
 
 function PageFallback() {
   return <div className="page-loading">Loading...</div>;
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="staff" element={<ProtectedRoute path="/staff"><StaffPage /></ProtectedRoute>} />
           <Route path="office-dashboard" element={<ProtectedRoute path="/office-dashboard"><OfficeDashboard /></ProtectedRoute>} />
           <Route path="offices" element={<ProtectedRoute path="/offices"><OfficeManagement /></ProtectedRoute>} />
+          <Route path="messages" element={<ProtectedRoute path="/messages"><Messages /></ProtectedRoute>} />
         </Route>
       </Routes>
     </Suspense>

@@ -222,3 +222,26 @@ input, select, textarea {
 .mt-3 { margin-top: 1.5rem; }
 .mb-2 { margin-bottom: 1rem; }
 .gap-2 { gap: 1rem; }
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 700px) {
+  .card {
+    padding: 1rem;
+  }
+
+  table {
+    min-width: 680px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-content h1 {
+    font-size: 1.35rem;
+  }
+}

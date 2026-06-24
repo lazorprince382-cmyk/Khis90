@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import QrScanner from './QrScanner';
 import { ScanIllustration, ScanCardMock, getScanIllustrationType } from './ScanIllustration';
+import PhotoPreview from './PhotoPreview';
 import './ScanInterface.css';
 
 const SCAN_CONFIG = {
@@ -132,7 +133,11 @@ export default function ScanInterface({ scanType, scannerLocation, modeOptions }
             {result.data?.alert && <div className="alert-banner">⚠️ {result.data.alert}</div>}
             {result.type === 'approved' && result.data?.learner && (
               <div className="result-learner-card">
-                {result.data.learner.photo_url && <img src={result.data.learner.photo_url} alt="" />}
+                {result.data.learner.photo_url && (
+                  <PhotoPreview src={result.data.learner.photo_url} alt={`${result.data.learner.name} profile photo`}>
+                    <img src={result.data.learner.photo_url} alt="" />
+                  </PhotoPreview>
+                )}
                 <div>
                   <strong>{result.data.learner.name}</strong>
                   <span>{result.data.learner.class_name} · {result.data.learner.card_id}</span>

@@ -15,6 +15,7 @@ export const pageLoaders = {
   staff: () => import('../pages/StaffPage'),
   officeDashboard: () => import('../pages/OfficeDashboard'),
   offices: () => import('../pages/OfficeManagement'),
+  messages: () => import('../pages/Messages'),
 };
 
 const routeLoaders = {
@@ -33,6 +34,7 @@ const routeLoaders = {
   '/staff': pageLoaders.staff,
   '/office-dashboard': pageLoaders.officeDashboard,
   '/offices': pageLoaders.offices,
+  '/messages': pageLoaders.messages,
 };
 
 const preloadedRoutes = new Set();

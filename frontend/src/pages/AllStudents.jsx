@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import PhotoPreview from '../components/PhotoPreview';
 import './StudentDirectory.css';
 
 const CLASSES = ['KG1','KG2','G1','G2','G3','G4','G5','Year 7','Year 8','Year 9','Year 10','Year 11','Year 12','Year 13'];
@@ -12,7 +13,11 @@ function initials(row) {
 function StudentPhoto({ row }) {
   const [failed, setFailed] = useState(false);
   if (row.photo_url && !failed) {
-    return <img className="student-photo" src={row.photo_url} alt="" onError={() => setFailed(true)} />;
+    return (
+      <PhotoPreview src={row.photo_url} alt={`${row.first_name} ${row.last_name} profile photo`}>
+        <img className="student-photo" src={row.photo_url} alt="" onError={() => setFailed(true)} />
+      </PhotoPreview>
+    );
   }
   return <span className="student-photo">{initials(row)}</span>;
 }

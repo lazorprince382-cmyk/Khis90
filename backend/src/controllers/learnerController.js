@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { logAudit } = require('../utils/audit');
 const { generateCardId, generateQRCode, generateBarcode, uuidv4 } = require('../utils/cardGenerator');
 
 async function generateUniqueCardAssets(client, learnerId, learnerPayload) {
@@ -54,6 +55,7 @@ async function registerLearner(req, res) {
     await client.query('COMMIT');
 
     const learner = learnerResult.rows[0];
+    await logAudit(req, 'learner.created', 'learner', learner.id, { registration_number: cleanRegNo, class_name });
     res.status(201).json({
       message: 'Learner registered successfully. ID card generated.',
       learner: {
@@ -204,7 +206,7 @@ async function getLearnerCard(req, res) {
 }
 
 async function bulkImport(req, res) {
-  const { learners } = req.body;
+  const { learners, file_name } = req.body;
   if (!Array.isArray(learners) || learners.length === 0) {
     return res.status(400).json({ error: 'Learners array required.' });
   }
@@ -242,6 +244,16 @@ async function bulkImport(req, res) {
         });
       }
     }
+    await client.query(
+      `INSERT INTO import_batches (created_by, file_name, total_rows, success_count, failed_count, errors)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [req.user?.id || null, file_name || 'manual-import', learners.length, results.success, results.failed, JSON.stringify(results.errors)]
+    );
+    await logAudit(req, 'learners.bulk_imported', 'learner', null, {
+      total: learners.length,
+      success: results.success,
+      failed: results.failed,
+    });
     res.json(results);
   } finally {
     client.release();
@@ -258,6 +270,7 @@ async function updateLearnerPhoto(req, res) {
       [photoUrl, id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Learner not found.' });
+    await logAudit(req, 'learner.photo_updated', 'learner', result.rows[0].id);
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update photo.' });
@@ -274,6 +287,7 @@ async function updateLearnerClass(req, res) {
       [class_name, term_id, id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Learner not found.' });
+    await logAudit(req, 'learner.class_updated', 'learner', id, { class_name, term_id });
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update learner.' });
@@ -323,6 +337,7 @@ async function updateLearner(req, res) {
       ]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Learner not found.' });
+    await logAudit(req, 'learner.updated', 'learner', id, { registration_number: cleanRegNo, class_name });
     res.json(result.rows[0]);
   } catch (err) {
     if (err.code === '23505') return res.status(409).json({ error: 'Registration number already exists.' });
@@ -339,6 +354,7 @@ async function deleteLearner(req, res) {
       [id]
     );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Learner not found.' });
+    await logAudit(req, 'learner.deleted', 'learner', id);
     res.json({ message: 'Learner deleted.' });
   } catch (err) {
     console.error('Delete learner error:', err);

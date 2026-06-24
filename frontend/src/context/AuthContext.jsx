@@ -2,15 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-const ROLE_NAV = {
-  admin: ['*'],
-  security: ['/', '/lookup', '/scan/gate', '/scan/lunch', '/notifications', '/visitors', '/staff', '/scan'],
-  librarian: ['/', '/lookup', '/scan/library', '/notifications', '/scan'],
-  cafeteria: ['/', '/lookup', '/scan/lunch', '/notifications', '/scan'],
-  staff: ['/', '/lookup', '/notifications'],
-  office_manager: ['/', '/lookup', '/notifications', '/office-dashboard'],
-};
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('kis_token'));
@@ -50,8 +41,10 @@ export function AuthProvider({ children }) {
 
   const canAccess = (path) => {
     if (!user) return false;
-    const allowed = ROLE_NAV[user.role] || [];
+    if (path === '/messages') return true;
+    const allowed = user.dashboard_access || [];
     if (allowed.includes('*')) return true;
+    if (path === '/') return allowed.includes('/');
     return allowed.some((p) => path === p || (p !== '/' && path.startsWith(p)));
   };
 

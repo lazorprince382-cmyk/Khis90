@@ -7,6 +7,7 @@ export default function Reports() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [className, setClassName] = useState('');
   const [report, setReport] = useState(null);
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => { loadReport(); }, []);
@@ -14,8 +15,12 @@ export default function Reports() {
   async function loadReport() {
     setLoading(true);
     try {
-      const data = await api.getAttendance(date, className || undefined);
-      setReport(data);
+      const [attendance, daily] = await Promise.all([
+        api.getAttendance(date, className || undefined),
+        api.getDailySummary(date),
+      ]);
+      setReport(attendance);
+      setSummary(daily);
     } finally {
       setLoading(false);
     }
@@ -54,9 +59,21 @@ export default function Reports() {
             </select>
           </div>
         </div>
-        <button className="btn btn-primary" onClick={loadReport} disabled={loading}>Generate Report</button>
-        <button className="btn btn-outline" onClick={handleExport} style={{ marginLeft: '0.5rem' }}>📥 Export CSV</button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button className="btn btn-primary" onClick={loadReport} disabled={loading}>Generate Report</button>
+          <button className="btn btn-outline" onClick={handleExport}>Export Attendance CSV</button>
+          <button className="btn btn-outline" onClick={() => api.exportDailyActivity(date)}>Export Daily Activity</button>
+        </div>
       </div>
+
+      {summary && (
+        <div className="stats-grid" style={{ marginBottom: '1.5rem' }}>
+          <div className="stat-card"><div className="stat-info"><span className="stat-value">{summary.learners_present}</span><span className="stat-label">Present Today</span></div></div>
+          <div className="stat-card"><div className="stat-info"><span className="stat-value">{summary.learners_absent}</span><span className="stat-label">Absent Today</span></div></div>
+          <div className="stat-card"><div className="stat-info"><span className="stat-value">{summary.visitors_today}</span><span className="stat-label">Visitors Today</span></div></div>
+          <div className="stat-card"><div className="stat-info"><span className="stat-value">{summary.scan_counts?.reduce((sum, row) => sum + Number(row.count || 0), 0) || 0}</span><span className="stat-label">Total Scans</span></div></div>
+        </div>
+      )}
 
       {report && (
         <>
@@ -70,7 +87,7 @@ export default function Reports() {
               </div>
             ))}
           </div>
-          <div className="card">
+          <div className="card table-scroll">
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid var(--kis-blue-light)', textAlign: 'left' }}>
@@ -88,9 +105,9 @@ export default function Reports() {
                     <td style={{ padding: '0.75rem' }}>{l.first_name} {l.last_name}</td>
                     <td>{l.class_name}</td>
                     <td><span className={`badge ${l.present ? 'badge-in-school' : 'badge-out'}`}>{l.present ? 'Present' : 'Absent'}</span></td>
-                    <td>{l.arrival_time ? new Date(l.arrival_time).toLocaleTimeString() : '—'}</td>
-                    <td>{l.departure_time ? new Date(l.departure_time).toLocaleTimeString() : '—'}</td>
-                    <td>{l.lunch_today ? '✓' : '—'}</td>
+                    <td>{l.arrival_time ? new Date(l.arrival_time).toLocaleTimeString() : '-'}</td>
+                    <td>{l.departure_time ? new Date(l.departure_time).toLocaleTimeString() : '-'}</td>
+                    <td>{l.lunch_today ? 'Yes' : '-'}</td>
                   </tr>
                 ))}
               </tbody>

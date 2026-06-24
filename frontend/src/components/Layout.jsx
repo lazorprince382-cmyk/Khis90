@@ -1,15 +1,24 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
 import { preloadRoute } from '../routes/pageLoaders';
+import { api } from '../services/api';
 import logo from '../assets/logo.png';
 import {
   IconDashboard, IconUserPlus, IconUpload, IconSearch, IconGate, IconLunch,
-  IconLibrary, IconVisitors, IconStaff, IconReports, IconSettings, IconBell, IconOffice,
+  IconLibrary, IconVisitors, IconStaff, IconReports, IconSettings, IconBell,
   IconCard,
 } from './Icons';
 import './Layout.css';
+
+const SIDEBAR_PREF_KEY = 'kis_sidebar_open';
+
+const IconMessages = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12a8 8 0 0 1-8 8H6l-3 2 1.2-4.3A8 8 0 1 1 21 12z" />
+  </svg>
+);
 
 const ALL_NAV = [
   { to: '/', label: 'Dashboard', Icon: IconDashboard, roles: ['*'] },
@@ -26,28 +35,42 @@ const ALL_NAV = [
   { to: '/reports', label: 'Reports', Icon: IconReports, roles: ['admin'] },
   { to: '/settings', label: 'Settings', Icon: IconSettings, roles: ['admin'] },
   { to: '/notifications', label: 'Notifications', Icon: IconBell, roles: ['*'] },
-  { to: '/office-dashboard', label: 'Office Dashboard', Icon: IconOffice, roles: ['admin', 'office_manager'] },
-  { to: '/offices', label: 'Manage Offices', Icon: IconSettings, roles: ['admin'] },
+  { to: '/messages', label: 'Messages', Icon: IconMessages, roles: ['*'] },
+  { to: '/offices', label: 'Manage Accounts', Icon: IconSettings, roles: ['admin'] },
 ];
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [messageUnreadCount, setMessageUnreadCount] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(() => localStorage.getItem(SIDEBAR_PREF_KEY) !== 'false');
   const [searchQuery, setSearchQuery] = useState('');
   const [now, setNow] = useState(new Date());
+  const messageUnreadRef = useRef(0);
+
+  const updateMessageUnread = (count) => {
+    const next = Math.max(0, Number(count || 0));
+    messageUnreadRef.current = next;
+    setMessageUnreadCount(next);
+  };
 
   const navItems = ALL_NAV.filter((item) => {
     if (!user) return false;
     if (user.role === 'admin') return true;
-    return item.roles.includes(user.role) || item.roles.includes('*');
+    const access = user.dashboard_access || [];
+    return item.roles.includes('*') || access.includes('*') || access.includes(item.to);
   });
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('drawer-open', sidebarOpen && window.innerWidth <= 900);
+    return () => document.body.classList.remove('drawer-open');
+  }, [sidebarOpen]);
 
   useEffect(() => {
     const token = localStorage.getItem('kis_token');
@@ -58,13 +81,66 @@ export default function Layout() {
     return () => socket.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!user?.id) return undefined;
+
+    let mounted = true;
+    const loadMessageUnread = async () => {
+      try {
+        const contacts = await api.listMessageContacts();
+        if (!mounted) return;
+        const total = contacts.reduce((sum, contact) => sum + Number(contact.unread_count || 0), 0);
+        updateMessageUnread(total);
+      } catch {
+        // Keep the current badge if contacts fail to load temporarily.
+      }
+    };
+
+    const notifyDesktop = (message) => {
+      if (!('Notification' in window) || document.visibilityState === 'visible') return;
+      const title = message.sender_name ? `New message from ${message.sender_name}` : 'New message';
+      const body = message.body || message.attachment_name || (message.is_voice_note ? 'Voice note' : 'You have a new message');
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, tag: `kis-message-${message.sender_id}` });
+      } else if (Notification.permission === 'default') {
+        Notification.requestPermission().then((permission) => {
+          if (permission === 'granted') new Notification(title, { body, tag: `kis-message-${message.sender_id}` });
+        }).catch(() => {});
+      }
+    };
+
+    loadMessageUnread();
+    const interval = setInterval(loadMessageUnread, 30000);
+    const socket = io('/', { transports: ['websocket', 'polling'] });
+    socket.on('message:new', (message) => {
+      if (message.recipient_id !== user.id || message.sender_id === user.id) return;
+      updateMessageUnread(messageUnreadRef.current + 1);
+      notifyDesktop(message);
+    });
+    const handleMessageUnread = (event) => updateMessageUnread(event.detail?.count || 0);
+    window.addEventListener('kis:messages-unread', handleMessageUnread);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      socket.disconnect();
+      window.removeEventListener('kis:messages-unread', handleMessageUnread);
+    };
+  }, [user?.id]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) navigate(`/lookup?q=${encodeURIComponent(searchQuery.trim())}`);
   };
 
+  const setSidebarPreference = (open) => {
+    localStorage.setItem(SIDEBAR_PREF_KEY, open ? 'true' : 'false');
+    setSidebarOpen(open);
+  };
+
   return (
     <div className="app-shell">
+      {sidebarOpen && <button type="button" className="sidebar-scrim" aria-label="Close menu" onClick={() => setSidebarPreference(false)} />}
       <aside className={`app-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
         <div className="sidebar-brand">
           <img src={logo} alt="KIS" className="sidebar-logo" />
@@ -81,11 +157,13 @@ export default function Layout() {
               end={to === '/'}
               onMouseEnter={() => preloadRoute(to)}
               onFocus={() => preloadRoute(to)}
+              onClick={() => { if (window.innerWidth <= 900) setSidebarOpen(false); }}
               className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
             >
               <Icon />
               <span>{label}</span>
               {to === '/notifications' && unreadCount > 0 && <span className="sidebar-badge">{unreadCount}</span>}
+              {to === '/messages' && messageUnreadCount > 0 && <span className="sidebar-badge message-badge">{messageUnreadCount}</span>}
             </NavLink>
           ))}
         </nav>
@@ -99,7 +177,7 @@ export default function Layout() {
 
       <div className="app-main">
         <header className="topbar">
-          <button type="button" className="topbar-menu" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle menu">
+          <button type="button" className="topbar-menu" onClick={() => setSidebarPreference(!sidebarOpen)} aria-label="Toggle menu">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
           <form className="topbar-search" onSubmit={handleSearch}>
@@ -125,7 +203,7 @@ export default function Layout() {
           </div>
         </header>
         <main className="page-content">
-          <Outlet context={{ setUnreadCount, now }} />
+          <Outlet context={{ setUnreadCount, setMessageUnreadCount: updateMessageUnread, now }} />
         </main>
       </div>
     </div>
