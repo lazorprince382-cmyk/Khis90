@@ -1,0 +1,218 @@
+.scan-page-v2 {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.scan-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.scan-page-header h1 {
+  font-size: 1.4rem;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+
+.scan-page-header p {
+  color: var(--kis-gray);
+  font-size: 0.92rem;
+}
+
+.scan-mode-btns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-btn {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 2px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  transition: all 0.15s;
+}
+
+.mode-btn.active {
+  background: var(--kis-maroon);
+  border-color: var(--kis-maroon);
+  color: #fff;
+}
+
+.scan-card-v2 {
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.scan-tabs {
+  display: flex;
+  border-bottom: 1px solid #e8ecf1;
+}
+
+.scan-tab {
+  flex: 1;
+  padding: 0.85rem;
+  background: #fafafa;
+  border: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--kis-gray);
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.scan-tab.active {
+  background: #fff;
+  color: var(--kis-maroon);
+  border-bottom-color: var(--kis-maroon);
+}
+
+.scan-body {
+  display: grid;
+  grid-template-columns: 110px 1fr 110px;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .scan-body { grid-template-columns: 1fr; }
+  .scan-illustration, .scan-card-mock { display: none; }
+}
+
+.scan-center { max-width: 420px; margin: 0 auto; width: 100%; }
+
+.scan-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.scan-input-row {
+  display: flex;
+  align-items: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+  background: #fafafa;
+}
+
+.scan-input-row input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  outline: none;
+  text-align: center;
+}
+
+.barcode-icon {
+  color: #9ca3af;
+  font-size: 0.8rem;
+  letter-spacing: -2px;
+}
+
+.scan-submit-btn {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.scan-result-v2 {
+  background: #fff;
+  border: 1px solid #e8ecf1;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.scan-result-v2.approved { border-color: #86efac; }
+.scan-result-v2.denied { border-color: #fca5a5; }
+
+.result-icon-lg { font-size: 3rem; margin-bottom: 0.5rem; }
+.scan-result-v2 h2 { margin-bottom: 0.5rem; }
+.scan-result-v2.approved h2 { color: #166534; }
+.scan-result-v2.denied h2 { color: #dc2626; }
+
+.result-learner-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 360px;
+  text-align: left;
+}
+
+.result-learner-card img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.result-learner-card strong { display: block; }
+.result-learner-card span { font-size: 0.85rem; color: var(--kis-gray); }
+
+.type-tag {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.type-tag.day { background: var(--kis-yellow); }
+.type-tag.boarding { background: var(--kis-blue-light); color: var(--kis-blue-dark); }
+
+.green-light {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--kis-green);
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 40px rgba(34, 197, 94, 0.5);
+  position: relative;
+}
+
+.green-light span { font-size: 2.5rem; color: #fff; z-index: 1; }
+
+.light-glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,197,94,0.4) 0%, transparent 70%);
+  animation: pulse-green 1.5s ease-in-out infinite;
+}
+
+.alert-banner {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  margin: 0.75rem auto;
+  max-width: 400px;
+}

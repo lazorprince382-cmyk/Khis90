@@ -1,0 +1,262 @@
+.lookup-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.lookup-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.lookup-input:focus {
+  border-color: var(--kis-blue);
+  outline: none;
+}
+
+.search-results {
+  list-style: none;
+  margin-top: 1rem;
+  border-top: 1px solid var(--kis-gray-light);
+}
+
+.search-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: var(--kis-blue-light);
+}
+
+.result-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--kis-gray);
+  margin-top: 0.15rem;
+}
+
+.lookup-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.lookup-card-section {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .lookup-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .lookup-form {
+    flex-direction: column;
+  }
+}
+
+.profile-header {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.profile-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--kis-maroon);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 1;
+  filter: none;
+  image-rendering: auto;
+}
+
+.profile-photo-error {
+  width: 100%;
+  margin: 0;
+}
+
+.profile-header h3 {
+  font-size: 1.35rem;
+  color: var(--kis-maroon);
+}
+
+.profile-header p {
+  color: var(--kis-gray);
+  font-size: 0.9rem;
+}
+
+.profile-status {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--kis-gray-light);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+}
+
+.status-item {
+  text-align: center;
+}
+
+.status-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--kis-gray);
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.profile-contact {
+  padding-top: 1rem;
+  border-top: 1px solid var(--kis-gray-light);
+}
+
+.profile-contact h4 {
+  color: var(--kis-maroon);
+  margin-bottom: 0.5rem;
+}
+
+.profile-contact p {
+  font-size: 0.9rem;
+  color: var(--kis-gray);
+}
+
+.activity-timeline {
+  list-style: none;
+}
+
+.timeline-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--kis-gray-light);
+}
+
+.timeline-type {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.timeline-time {
+  font-size: 0.85rem;
+  color: var(--kis-gray);
+}
+
+.timeline-location {
+  font-size: 0.8rem;
+  color: var(--kis-blue);
+}
+
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(17, 24, 39, 0.58);
+}
+
+.crop-dialog {
+  width: min(440px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+}
+
+.crop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.crop-header h2 {
+  color: var(--kis-maroon);
+  font-size: 1.1rem;
+}
+
+.crop-close {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--kis-gray-light);
+  color: var(--kis-black);
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.crop-preview {
+  width: min(330px, 82vw);
+  aspect-ratio: 1;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  border: 3px solid var(--kis-blue);
+  background-repeat: no-repeat;
+  background-color: #fff;
+  box-shadow: inset 0 0 0 999px rgba(255, 255, 255, 0);
+}
+
+.crop-controls {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.crop-controls label {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--kis-gray);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.crop-controls input {
+  width: 100%;
+  accent-color: var(--kis-maroon);
+}
+
+.crop-error {
+  margin: 0.85rem 0 0;
+}
+
+.crop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}

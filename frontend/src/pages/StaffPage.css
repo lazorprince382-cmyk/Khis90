@@ -1,0 +1,128 @@
+.staff-page .page-title-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.staff-illustration { font-size: 3rem; opacity: 0.6; }
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.25rem;
+}
+
+.section-desc {
+  font-size: 0.85rem;
+  color: var(--kis-gray);
+  margin-bottom: 1rem;
+}
+
+.count-badge {
+  font-weight: 400;
+  color: var(--kis-gray);
+  font-size: 0.9rem;
+}
+
+.staff-scan-card { margin-bottom: 1.25rem; }
+
+.staff-scan-row {
+  display: flex;
+  gap: 0.65rem;
+  align-items: stretch;
+}
+
+.staff-scan-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0 1rem;
+  background: #fafafa;
+}
+
+.staff-scan-input-wrap input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 0;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.input-icon { opacity: 0.5; }
+
+.scan-feedback {
+  margin-top: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.scan-feedback.ok { background: #f0fdf4; color: #166534; }
+.scan-feedback.err { background: #fef2f2; color: #dc2626; }
+
+.staff-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 900px) { .staff-form-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 500px) { .staff-form-grid { grid-template-columns: 1fr; } }
+
+.staff-page .ui-card { margin-bottom: 1.25rem; }
+
+.data-table-wrap { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.75rem;
+  border-bottom: 2px solid #f3f4f6;
+  color: var(--kis-gray);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.data-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.data-table code {
+  background: #f3f4f6;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-pill.in { background: #dcfce7; color: #166534; }
+.status-pill.out { background: #f3f4f6; color: #6b7280; }
+
+.empty-table {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--kis-gray);
+}
+
+.empty-table-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+.empty-table p { color: #374151; margin-bottom: 0.25rem; }
+.empty-table span { font-size: 0.85rem; }

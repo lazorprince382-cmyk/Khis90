@@ -1,0 +1,155 @@
+.id-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.id-card-v2 {
+  width: 280px;
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #e8ecf1;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(123, 30, 58, 0.12);
+  text-align: center;
+  padding-bottom: 1rem;
+}
+
+.id-card-v2.preview {
+  border: 2px dashed #d1d5db;
+  box-shadow: none;
+}
+
+.idv2-header {
+  background: var(--kis-maroon);
+  color: #fff;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+}
+
+.idv2-logo {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.idv2-school {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.idv2-motto {
+  font-size: 0.58rem;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.idv2-photo-wrap {
+  margin: 1rem auto 0.5rem;
+}
+
+.idv2-photo, .idv2-photo-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--kis-blue);
+  margin: 0 auto;
+}
+
+.idv2-photo-placeholder {
+  background: var(--kis-blue-light);
+  color: var(--kis-blue-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.idv2-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  padding: 0 1rem;
+}
+
+.idv2-type {
+  display: inline-block;
+  margin: 0.5rem 0;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.idv2-type-day { background: var(--kis-yellow); color: #111; }
+.idv2-type-boarding { background: var(--kis-maroon); color: #fff; }
+
+.idv2-meta {
+  font-size: 0.78rem;
+  color: var(--kis-gray);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.idv2-qr img {
+  width: 90px;
+  height: 90px;
+}
+
+.idv2-qr-placeholder .qr-mock {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  background: repeating-linear-gradient(45deg, #e5e7eb, #e5e7eb 4px, #f9fafb 4px, #f9fafb 8px);
+  border-radius: 8px;
+}
+
+.idv2-barcode {
+  margin-top: 0.5rem;
+  padding: 0 1rem;
+}
+
+.barcode-lines {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 40px;
+  margin-bottom: 0.25rem;
+}
+
+.barcode-bar {
+  width: 2px;
+  background: #111;
+}
+
+.idv2-barcode span, .idv2-card-id {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--kis-maroon);
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .id-card-v2, .id-card-v2 * { visibility: visible; }
+  .id-card-v2 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: none;
+  }
+}

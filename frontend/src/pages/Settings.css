@@ -1,0 +1,121 @@
+.settings-toast {
+  background: #f0fdf4;
+  color: #166534;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .settings-layout { grid-template-columns: 1fr; }
+}
+
+.settings-main .ui-card { margin-bottom: 1.25rem; }
+
+.settings-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+.settings-time-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.holiday-form, .term-form {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.holiday-form input, .term-form input {
+  flex: 1;
+  min-width: 140px;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.holiday-list { list-style: none; }
+
+.holiday-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.9rem;
+}
+
+.btn-text-danger {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sidebar-widget h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 0.75rem;
+}
+
+.widget-list { list-style: none; }
+
+.widget-list li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.widget-list strong { display: block; font-size: 0.88rem; }
+.widget-list span { font-size: 0.78rem; color: var(--kis-gray); }
+
+.widget-link {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--kis-blue);
+  font-weight: 600;
+}
+
+.widget-empty { font-size: 0.85rem; color: var(--kis-gray); }
+
+.term-widget {
+  background: linear-gradient(135deg, #f0fdf4, #fff) !important;
+  border-color: #bbf7d0 !important;
+}
+
+.term-widget-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+.term-widget-dates {
+  font-size: 0.82rem;
+  color: var(--kis-gray);
+  margin: 0.35rem 0;
+}
+
+.term-widget-status {
+  font-size: 0.8rem;
+  color: #166534;
+  font-weight: 600;
+}

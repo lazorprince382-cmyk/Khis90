@@ -1,0 +1,237 @@
+.register-page {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.register-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.register-hero-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff1f5, #fde7ef);
+  color: var(--kis-maroon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.9rem;
+  font-weight: 800;
+  box-shadow: 0 10px 28px rgba(123, 30, 58, 0.08);
+}
+
+.register-hero h1 {
+  font-size: 1.62rem;
+  color: #0f172a;
+  line-height: 1.15;
+  margin-bottom: 0.35rem;
+}
+
+.register-hero p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.register-shell {
+  background: #fff;
+  border: 1px solid #edf0f5;
+  border-radius: 18px;
+  padding: 1.7rem;
+  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.06);
+}
+
+.register-shell form {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.register-shell .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+
+.register-shell .form-group {
+  margin-bottom: 1.18rem;
+}
+
+.register-shell .form-group label {
+  color: #111827;
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-bottom: 0.55rem;
+}
+
+.register-shell .form-group label span {
+  color: #ef4444;
+}
+
+.reg-control {
+  min-height: 56px;
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid #d9dee8;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.reg-control:focus-within {
+  border-color: var(--kis-maroon);
+  box-shadow: 0 0 0 4px rgba(123, 30, 58, 0.08);
+}
+
+.reg-field-icon {
+  width: 58px;
+  min-width: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fff3f7, #fde8f0);
+  color: var(--kis-maroon);
+  border-right: 1px solid #f1d7e0;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.reg-control input,
+.reg-control select {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0 1.1rem;
+  color: #111827;
+  background: transparent;
+  font-size: 1rem;
+}
+
+.reg-control input::placeholder {
+  color: #7b8495;
+}
+
+.phone-control .phone-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  border-right: 1px solid #e5e7eb;
+  color: #111827;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.phone-control input {
+  padding-left: 0.95rem;
+}
+
+.photo-drop {
+  min-height: 86px;
+  display: grid !important;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1.5px dashed #f0b8cc;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff8fa, #fff);
+  cursor: pointer;
+}
+
+.photo-drop input {
+  display: none;
+}
+
+.photo-drop-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: #fde8f0;
+  color: var(--kis-maroon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.photo-drop-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.photo-drop-copy strong {
+  color: var(--kis-maroon);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.photo-drop-copy em {
+  color: #334155;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.photo-drop-copy small {
+  color: #64748b;
+  font-size: 0.87rem;
+}
+
+.photo-browse {
+  border: 1px solid #f1c6d5;
+  border-radius: 9px;
+  padding: 0.72rem 1.1rem;
+  color: var(--kis-maroon);
+  background: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.btn-register {
+  width: 100%;
+  min-height: 64px;
+  margin-top: 0.2rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #b41354, var(--kis-maroon));
+  box-shadow: 0 16px 30px rgba(123, 30, 58, 0.18);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.btn-register:hover {
+  background: linear-gradient(135deg, #9f1049, #68172f);
+  transform: translateY(-1px);
+}
+
+.register-shell .alert-success,
+.register-shell .alert-error {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 760px) {
+  .register-shell {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .register-shell .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .photo-drop {
+    grid-template-columns: 52px 1fr;
+  }
+
+  .photo-browse {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+}

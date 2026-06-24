@@ -1,0 +1,29 @@
+.qr-scanner {
+  margin-bottom: 1.5rem;
+}
+
+.qr-reader {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 3px solid var(--kis-blue);
+}
+
+.qr-reader video {
+  border-radius: var(--radius);
+}
+
+.qr-hint {
+  text-align: center;
+  color: var(--kis-gray);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.qr-error {
+  text-align: center;
+  color: var(--kis-red);
+  font-size: 0.9rem;
+  padding: 1rem;
+  background: var(--kis-red-light);
+  border-radius: 8px;
+}
