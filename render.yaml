@@ -3,7 +3,7 @@ services:
     name: khis90
     runtime: node
     plan: free
-    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build && cd ../backend && npm run db:setup
+    buildCommand: cd backend && npm ci && cd ../frontend && npm ci --include=dev && npm run build && cd ../backend && npm run db:setup
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
