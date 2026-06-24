@@ -6,21 +6,26 @@ require('dotenv').config();
 
 async function setupDatabase() {
   const dbUrl = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/kis_school';
-  const adminUrl = dbUrl.replace(/\/kis_school$/, '/postgres');
+  const shouldCreateLocalDb = !process.env.DATABASE_URL;
 
-  const admin = new Client({ connectionString: adminUrl });
-  try {
-    await admin.connect();
-    const exists = await admin.query("SELECT 1 FROM pg_database WHERE datname = 'kis_school'");
-    if (exists.rows.length === 0) {
-      await admin.query('CREATE DATABASE kis_school');
-      console.log('Database kis_school created.');
+  if (shouldCreateLocalDb) {
+    const adminUrl = dbUrl.replace(/\/kis_school$/, '/postgres');
+    const admin = new Client({ connectionString: adminUrl });
+    try {
+      await admin.connect();
+      const exists = await admin.query("SELECT 1 FROM pg_database WHERE datname = 'kis_school'");
+      if (exists.rows.length === 0) {
+        await admin.query('CREATE DATABASE kis_school');
+        console.log('Database kis_school created.');
+      }
+    } catch (err) {
+      console.error('Could not create database:', err.message);
+      process.exit(1);
+    } finally {
+      await admin.end();
     }
-  } catch (err) {
-    console.error('Could not create database:', err.message);
-    process.exit(1);
-  } finally {
-    await admin.end();
+  } else {
+    console.log('Using provided DATABASE_URL; skipping database creation.');
   }
 
   const pool = new Client({ connectionString: dbUrl });

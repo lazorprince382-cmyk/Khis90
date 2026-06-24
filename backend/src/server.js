@@ -48,6 +48,15 @@ app.use('/api/offices', officeRoutes);
 app.use('/api/messages', createMessageRoutes(io));
 app.use('/api/admin', adminRoutes);
 
+const frontendDist = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDist));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+  res.sendFile(path.join(frontendDist, 'index.html'), (err) => {
+    if (err) next();
+  });
+});
+
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
   socket.on('disconnect', () => console.log('Client disconnected:', socket.id));
