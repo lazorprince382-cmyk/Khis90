@@ -26,6 +26,7 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || (process.env.NODE_ENV === 'production' ? '127.0.0.1' : undefined);
 
 app.use(cors());
 app.use(express.json());
@@ -62,7 +63,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => console.log('Client disconnected:', socket.id));
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log(`KIS Server running on port ${PORT}`);
   console.log('Kabojja International School - We strive to achieve');
 });
