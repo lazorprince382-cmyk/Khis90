@@ -9,8 +9,13 @@ const SCAN_CONFIG = {
   gate_in: { title: 'Gate Entry', subtitle: 'Scan learner card to register school entry' },
   gate_out: { title: 'Gate Exit', subtitle: 'Scan learner card to register school exit' },
   lunch: { title: 'Lunch Scanner', subtitle: 'Scan card during lunch to mark the learner as fed', machine: true },
+  meal_break: { title: 'Break Service', subtitle: 'Record a learner collecting break at the dining hall', machine: true },
+  meal_lunch: { title: 'Lunch Service', subtitle: 'Record a learner collecting lunch at the dining hall', machine: true },
+  meal_supper: { title: 'Supper Service', subtitle: 'Boarding scholars only', machine: true },
   library_in: { title: 'Library Entry', subtitle: 'Scan learner card to enter the library' },
   library_out: { title: 'Library Exit', subtitle: 'Scan learner card to leave the library' },
+  dormitory_in: { title: 'Dormitory Check-in', subtitle: 'Boarding scholars only — record entry to the dormitory' },
+  dormitory_out: { title: 'Dormitory Check-out', subtitle: 'Boarding scholars only — record exit from the dormitory' },
 };
 
 export default function ScanInterface({ scanType, scannerLocation, modeOptions }) {

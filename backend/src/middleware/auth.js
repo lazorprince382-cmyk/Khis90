@@ -5,9 +5,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'kis-school-secret-change-in-produc
 
 const ROLE_PERMISSIONS = {
   admin: ['*'],
-  security: ['dashboard', 'lookup', 'scan_gate', 'scan_lunch', 'notifications', 'visitors', 'staff_view'],
+  security: ['dashboard', 'lookup', 'scan_gate', 'scan_lunch', 'scan_dormitory', 'notifications', 'visitors', 'staff_view'],
   librarian: ['dashboard', 'lookup', 'scan_library', 'notifications'],
   cafeteria: ['dashboard', 'lookup', 'scan_lunch', 'notifications'],
+  boarding: ['dashboard', 'lookup', 'scan_dormitory', 'notifications'],
   staff: ['dashboard', 'lookup', 'notifications'],
   office_manager: ['dashboard', 'lookup', 'notifications', 'office_dashboard', 'exeat'],
 };

@@ -167,6 +167,26 @@ async function getOfficeDashboard(req, res) {
     const locMap = { in_school: 0, in_library: 0, at_lunch: 0, out_of_school: 0 };
     locationCounts.rows.forEach((r) => { locMap[r.current_location] = r.count; });
 
+    const officeKey = `${office.name} ${office.department}`.toLowerCase();
+    const station = officeKey.includes('library') ? 'Library' : officeKey.includes('cafeteria') ? 'Meals' : officeKey.includes('boarding') ? 'Dormitory' : officeKey.includes('security') || officeKey.includes('day scholar') ? 'Gate' : 'School-wide';
+    const stationTypes = station === 'Library' ? ['library_in', 'library_out']
+      : station === 'Meals' ? ['lunch', 'meal_break', 'meal_lunch', 'meal_supper']
+      : station === 'Dormitory' ? ['dormitory_in', 'dormitory_out']
+      : station === 'Gate' ? ['gate_in', 'gate_out'] : null;
+    let stationSummary = { station, scans: 0, entries: 0, exits: 0 };
+    if (stationTypes) {
+      const summary = await pool.query(
+        `SELECT COUNT(*)::int AS scans,
+          COUNT(*) FILTER (WHERE scan_type::text LIKE '%_in' OR scan_type = 'lunch' OR scan_type::text LIKE 'meal_%')::int AS entries,
+          COUNT(*) FILTER (WHERE scan_type::text LIKE '%_out')::int AS exits
+         FROM scan_events se JOIN learners l ON l.id = se.learner_id
+         WHERE ${filter.where} AND se.scan_type = ANY($${filter.nextIdx}::scan_type[])
+           AND se.scanned_at >= CURRENT_DATE AND se.scanned_at < CURRENT_DATE + INTERVAL '1 day'`,
+        [...filter.params, stationTypes]
+      );
+      stationSummary = { station, ...summary.rows[0] };
+    }
+
     res.json({
       office,
       total_learners: parseInt(stats.rows[0].count),
@@ -175,6 +195,7 @@ async function getOfficeDashboard(req, res) {
       recent_scans_today: recentScans.rows,
       on_exeat: onExeat.rows,
       absent_day_scholars: absent.rows,
+      station_summary: stationSummary,
     });
   } catch (err) {
     console.error('Office dashboard error:', err);

@@ -1,5 +1,5 @@
 .scan-page-v2 {
-  max-width: 900px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -47,9 +47,10 @@
 
 .scan-card-v2 {
   background: #fff;
-  border: 1px solid #e8ecf1;
-  border-radius: 16px;
+  border: 1px solid #e5d5da;
+  border-radius: 20px;
   overflow: hidden;
+  box-shadow: 0 16px 40px rgba(74, 20, 35, 0.08);
 }
 
 .scan-tabs {

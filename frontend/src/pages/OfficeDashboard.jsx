@@ -236,7 +236,7 @@ export default function OfficeDashboard() {
 
 
 
-  const { office, total_learners, location_counts, learners_in_school, recent_scans_today, on_exeat, absent_day_scholars } = data;
+  const { office, total_learners, location_counts, learners_in_school, recent_scans_today, on_exeat, absent_day_scholars, station_summary } = data;
 
 
 
@@ -295,6 +295,14 @@ export default function OfficeDashboard() {
         <div className="office-stat"><span className="os-val">{absent_day_scholars?.length || 0}</span><span className="os-lbl">Absent (Day)</span></div>
 
       </div>
+
+      {station_summary?.station !== 'School-wide' && (
+        <div className="office-stats" style={{ marginTop: '1rem' }}>
+          <div className="office-stat"><span className="os-val">{station_summary.scans || 0}</span><span className="os-lbl">{station_summary.station} Scans Today</span></div>
+          <div className="office-stat"><span className="os-val">{station_summary.entries || 0}</span><span className="os-lbl">Recorded In / Served</span></div>
+          <div className="office-stat"><span className="os-val">{station_summary.exits || 0}</span><span className="os-lbl">Recorded Out</span></div>
+        </div>
+      )}
 
 
 

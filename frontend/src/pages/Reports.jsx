@@ -9,6 +9,9 @@ export default function Reports() {
   const [report, setReport] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [learnerQuery, setLearnerQuery] = useState('');
+  const [learnerMatches, setLearnerMatches] = useState([]);
+  const [movement, setMovement] = useState(null);
 
   useEffect(() => { loadReport(); }, []);
 
@@ -42,10 +45,38 @@ export default function Reports() {
     URL.revokeObjectURL(url);
   }
 
+  async function findLearnerMovement(e) {
+    e.preventDefault();
+    if (!learnerQuery.trim()) return;
+    setLoading(true);
+    try {
+      const matches = await api.searchLearners(learnerQuery.trim());
+      setLearnerMatches(matches);
+      if (matches.length === 1) await loadMovement(matches[0]);
+    } finally { setLoading(false); }
+  }
+
+  async function loadMovement(learner) {
+    const events = await api.getLearnerActivity(learner.id, date);
+    setMovement({ learner, events });
+    setLearnerMatches([]);
+  }
+
   return (
     <div>
       <h1 style={{ color: 'var(--kis-maroon)', marginBottom: '1.5rem' }}>Attendance Reports</h1>
       <div className="card mb-2">
+        <h2 className="card-title" style={{ marginBottom: '1rem' }}>Learner movement report</h2>
+        <p style={{ color: 'var(--kis-gray)', marginTop: '-.5rem' }}>View every recorded station movement for one learner on the selected date.</p>
+        <form className="lookup-form" onSubmit={findLearnerMovement} style={{ marginBottom: '1rem' }}>
+          <input value={learnerQuery} onChange={(e) => setLearnerQuery(e.target.value)} placeholder="Name, registration number, or card ID" className="lookup-input" />
+          <button className="btn btn-secondary" disabled={loading}>Find learner</button>
+        </form>
+        {learnerMatches.length > 1 && <div className="search-results">{learnerMatches.map((learner) => <button type="button" className="search-result-item" key={learner.id} onClick={() => loadMovement(learner)}><span><strong>{learner.first_name} {learner.last_name}</strong><span className="result-meta">{learner.class_name} · {learner.card_id}</span></span><span>View movement</span></button>)}</div>}
+        {movement && <div style={{ marginBottom: '1rem' }}><h3 style={{ marginBottom: '.5rem' }}>{movement.learner.first_name} {movement.learner.last_name}</h3>{movement.events.length ? <ul className="activity-timeline">{movement.events.map((event) => <li key={event.id} className="timeline-item"><span className="timeline-type">{event.scan_type.replaceAll('_', ' ')}</span><span className="timeline-time">{new Date(event.scanned_at).toLocaleString()}</span><span className="timeline-location">@ {event.scanner_location || 'Station not specified'}</span></li>)}</ul> : <p className="empty-state">No movement records for this date.</p>}</div>}
+      </div>
+      <div className="card mb-2">
+        <h2 className="card-title" style={{ marginBottom: '1rem' }}>Daily gate attendance</h2>
         <div className="form-row">
           <div className="form-group">
             <label>Date</label>

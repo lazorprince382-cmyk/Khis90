@@ -3,6 +3,16 @@ const { logAudit } = require('../utils/audit');
 const { generateCardId, generateQRCode, generateBarcode, uuidv4 } = require('../utils/cardGenerator');
 
 async function generateUniqueCardAssets(client, learnerId, learnerPayload) {
+  const requestedCardId = String(learnerPayload.registration_number || '').trim();
+  if (requestedCardId) {
+    const exists = await client.query('SELECT 1 FROM learners WHERE LOWER(card_id) = LOWER($1)', [requestedCardId]);
+    if (exists.rows.length) throw Object.assign(new Error('Registration number is already assigned to another learner.'), { code: '23505' });
+    return {
+      cardId: requestedCardId,
+      qrCodeData: await generateQRCode(requestedCardId, learnerId, learnerPayload),
+      barcodeData: generateBarcode(requestedCardId),
+    };
+  }
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const cardId = await generateCardId();
     const exists = await client.query('SELECT 1 FROM learners WHERE card_id = $1', [cardId]);

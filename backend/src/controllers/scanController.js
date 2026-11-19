@@ -17,25 +17,43 @@ const SCAN_RULES = {
     offices: ['Main Office', 'Security Office'],
   },
   lunch: {
-    allowedFrom: ['in_school', 'in_library', 'at_lunch'],
-    newLocation: 'in_school',
+    station: 'meal',
     message: (name) => `${name} has had lunch.`,
     offices: ['Cafeteria Office', 'Main Office'],
     setLunch: true,
   },
   library_in: {
-    allowedFrom: ['in_school'],
-    newLocation: 'in_library',
+    station: 'library',
     message: (name) => `${name} entered the library.`,
     offices: ['Library Office', 'Main Office'],
   },
   library_out: {
-    allowedFrom: ['in_library'],
-    newLocation: 'in_school',
+    station: 'library',
     message: (name) => `${name} left the library.`,
     offices: ['Library Office', 'Main Office'],
   },
+  meal_break: { station: 'meal', message: (name) => `${name} has collected break.` , offices: ['Cafeteria Office', 'Main Office'] },
+  meal_lunch: { station: 'meal', message: (name) => `${name} has collected lunch.` , offices: ['Cafeteria Office', 'Main Office'], setLunch: true },
+  meal_supper: { station: 'meal', message: (name) => `${name} has collected supper.` , offices: ['Cafeteria Office', 'Boarding Office'] },
+  dormitory_in: { station: 'dormitory', message: (name) => `${name} entered the dormitory.` , offices: ['Boarding Office'] },
+  dormitory_out: { station: 'dormitory', message: (name) => `${name} left the dormitory.` , offices: ['Boarding Office'] },
 };
+
+const STATION_SESSIONS = {
+  library: { in: 'library_in', out: 'library_out' },
+  dormitory: { in: 'dormitory_in', out: 'dormitory_out' },
+};
+
+async function isInsideStation(client, learnerId, station) {
+  const types = STATION_SESSIONS[station];
+  if (!types) return false;
+  const result = await client.query(
+    `SELECT scan_type FROM scan_events WHERE learner_id = $1 AND scan_type = ANY($2::scan_type[])
+     ORDER BY scanned_at DESC LIMIT 1`,
+    [learnerId, [types.in, types.out]]
+  );
+  return result.rows[0]?.scan_type === types.in;
+}
 
 function parseScanCode(value) {
   const raw = String(value || '').trim();
@@ -147,7 +165,9 @@ async function processScan(req, res, io) {
       });
     }
 
-    if (!rule.allowedFrom.includes(learner.current_location)) {
+    // Gate scans control attendance/presence only. Other stations are independent
+    // so a library, meal or dormitory scan never removes a learner from another station.
+    if (scan_type.startsWith('gate_') && !rule.allowedFrom.includes(learner.current_location)) {
       await client.query('ROLLBACK');
       const locationLabels = {
         out_of_school: 'outside the school', in_school: 'already in school',
@@ -158,6 +178,57 @@ async function processScan(req, res, io) {
         message: `${fullName} is ${locationLabels[learner.current_location]}. Cannot process ${scan_type.replace('_', ' ')}.`,
         learner: { id: learner.id, name: fullName, current_location: learner.current_location },
       });
+    }
+
+    if (scan_type === 'meal_supper' && !isBoarding) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ success: false, status: 'denied', message: 'Supper is available to boarding scholars only.' });
+    }
+
+    // A station records one entry and one exit per learner per day. This keeps
+    // attendance clean while still preserving the full movement history.
+    if (['gate_in', 'gate_out', 'library_in', 'library_out', 'dormitory_in', 'dormitory_out'].includes(scan_type)) {
+      const alreadyRecorded = await client.query(
+        `SELECT 1 FROM scan_events WHERE learner_id = $1 AND scan_type = $2
+         AND scanned_at >= CURRENT_DATE AND scanned_at < CURRENT_DATE + INTERVAL '1 day' LIMIT 1`,
+        [learner.id, scan_type]
+      );
+      if (alreadyRecorded.rows.length) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ success: false, status: 'denied', message: `${fullName} has already been recorded for this ${scan_type.replace('_', ' ')} today.` });
+      }
+    }
+
+    if (scan_type.startsWith('meal_')) {
+      const mealToday = await client.query(
+        `SELECT 1 FROM scan_events WHERE learner_id = $1 AND scan_type = $2
+         AND scanned_at >= CURRENT_DATE AND scanned_at < CURRENT_DATE + INTERVAL '1 day' LIMIT 1`,
+        [learner.id, scan_type]
+      );
+      if (mealToday.rows.length) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ success: false, status: 'denied', message: `${fullName} has already collected this meal today.` });
+      }
+    }
+
+    if (scan_type.startsWith('dormitory_') && !isBoarding) {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ success: false, status: 'denied', message: 'Dormitory access is for boarding scholars only.', learner: { id: learner.id, name: fullName, learner_type: learner.learner_type } });
+    }
+
+    if (scan_type === 'library_in' || scan_type === 'dormitory_in') {
+      const station = rule.station;
+      if (await isInsideStation(client, learner.id, station)) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ success: false, status: 'denied', message: `${fullName} is already recorded inside the ${station}.` });
+      }
+    }
+    if (scan_type === 'library_out' || scan_type === 'dormitory_out') {
+      const station = rule.station;
+      if (!await isInsideStation(client, learner.id, station)) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ success: false, status: 'denied', message: `${fullName} has no open ${station} entry to close.` });
+      }
     }
 
     if (scan_type === 'lunch' && learner.lunch_today) {
@@ -199,10 +270,18 @@ async function processScan(req, res, io) {
       [learner.id, scan_type, scanner_location || null, isLate, isEarly, alertMessage]
     );
 
-    let statusUpdate = `UPDATE learner_status SET current_location = $1, last_scan_at = CURRENT_TIMESTAMP`;
-    if (rule.setLunch) statusUpdate += `, lunch_today = TRUE`;
-    statusUpdate += ` WHERE learner_id = $2`;
-    await client.query(statusUpdate, [rule.newLocation, learner.id]);
+    // Only the gate changes school attendance. Station movements remain in scan_events.
+    if (scan_type.startsWith('gate_')) {
+      await client.query(
+        `UPDATE learner_status SET current_location = $1, last_scan_at = CURRENT_TIMESTAMP WHERE learner_id = $2`,
+        [rule.newLocation, learner.id]
+      );
+    } else {
+      let statusUpdate = 'UPDATE learner_status SET last_scan_at = CURRENT_TIMESTAMP';
+      if (rule.setLunch) statusUpdate += ', lunch_today = TRUE';
+      statusUpdate += ' WHERE learner_id = $1';
+      await client.query(statusUpdate, [learner.id]);
+    }
 
     let notificationMessage = rule.message(fullName);
     if (alertMessage) notificationMessage = alertMessage;
@@ -244,7 +323,7 @@ async function processScan(req, res, io) {
         learner_type: learner.learner_type, section: learner.section,
         boarding_house: learner.boarding_house,
         previous_location: learner.current_location,
-        current_location: rule.newLocation,
+        current_location: scan_type.startsWith('gate_') ? rule.newLocation : learner.current_location,
         lunch_today: rule.setLunch ? true : learner.lunch_today,
       },
       scanned_at: new Date().toISOString(),
@@ -270,10 +349,13 @@ async function getDashboardStats(req, res) {
     const result = await pool.query(`
       SELECT
         COUNT(*) FILTER (WHERE ls.current_location = 'in_school') AS in_school,
-        COUNT(*) FILTER (WHERE ls.current_location = 'in_library') AS in_library,
         COUNT(*) FILTER (WHERE ls.current_location = 'out_of_school') AS out_of_school,
         COUNT(*) FILTER (WHERE ls.lunch_today = TRUE) AS lunch_today,
         (SELECT COUNT(*) FROM scan_events WHERE scanned_at >= CURRENT_DATE AND scanned_at < CURRENT_DATE + INTERVAL '1 day') AS scans_today,
+        (SELECT COUNT(DISTINCT entered.learner_id) FROM scan_events entered
+          WHERE entered.scan_type = 'library_in' AND entered.scanned_at >= CURRENT_DATE
+          AND NOT EXISTS (SELECT 1 FROM scan_events exited WHERE exited.learner_id = entered.learner_id
+            AND exited.scan_type = 'library_out' AND exited.scanned_at > entered.scanned_at AND exited.scanned_at >= CURRENT_DATE)) AS in_library,
         (SELECT COUNT(*) FROM staff_members WHERE is_in_school = TRUE AND is_active = TRUE) AS staff_in_school,
         (SELECT COUNT(*) FROM visitors WHERE check_out_at IS NULL AND check_in_at >= CURRENT_DATE AND check_in_at < CURRENT_DATE + INTERVAL '1 day') AS visitors_today
       FROM learner_status ls
@@ -321,7 +403,7 @@ async function getDashboardDetails(req, res) {
             se.scanned_at AS lunch_at, se.scanner_location
          FROM scan_events se
          JOIN learners l ON l.id = se.learner_id
-         WHERE se.scan_type = 'lunch' AND DATE(se.scanned_at) = CURRENT_DATE
+         WHERE se.scan_type IN ('lunch', 'meal_lunch') AND DATE(se.scanned_at) = CURRENT_DATE
          ORDER BY l.id, se.scanned_at DESC`
       );
       return res.json({ kind, rows: result.rows });

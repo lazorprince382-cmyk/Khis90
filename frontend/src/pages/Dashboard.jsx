@@ -6,6 +6,7 @@ import PhotoPreview from '../components/PhotoPreview';
 import './Dashboard.css';
 
 const STAT_ICONS = {
+  'In Library Now': '📚',
   'In School': '🏫',
   'In Library': '📚',
   'Out of School': '🏠',
@@ -241,7 +242,7 @@ export default function Dashboard() {
   const date = now || new Date();
   const statCards = [
     { label: 'In School', value: stats?.in_school || 0, color: '#ef4444', bg: '#fef2f2', kind: 'in_school' },
-    { label: 'In Library', value: stats?.in_library || 0, color: '#3b82f6', bg: '#eff6ff', kind: 'library_sessions' },
+    { label: 'In Library Now', value: stats?.in_library || 0, color: '#3b82f6', bg: '#eff6ff', kind: 'library_sessions' },
     { label: 'Out of School', value: stats?.out_of_school || 0, color: '#22c55e', bg: '#f0fdf4', kind: 'out_of_school' },
     { label: 'Had Lunch Today', value: stats?.lunch_today || 0, color: '#16a34a', bg: '#f0fdf4', kind: 'lunch_today' },
     { label: 'Scans Today', value: stats?.scans_today || 0, color: '#7B1E3A', bg: '#fdf2f6', kind: 'scans_today' },
@@ -252,8 +253,9 @@ export default function Dashboard() {
   const quickActions = [
     { to: '/register', label: 'Register New Learner', bg: '#fdf2f6', color: '#7B1E3A', border: '#f0d4dc' },
     { to: '/scan/gate', label: 'Gate Scanner', bg: '#f9fafb', color: '#374151', border: '#e5e7eb' },
-    { to: '/scan/lunch', label: 'Lunch Scanner', bg: '#f0fdf4', color: '#166534', border: '#bbf7d0' },
+    { to: '/scan/lunch', label: 'Meals Scanner', bg: '#f0fdf4', color: '#166534', border: '#bbf7d0' },
     { to: '/scan/library', label: 'Library Scanner', bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe' },
+    { to: '/scan/dormitory', label: 'Dormitory Scanner', bg: '#f5f3ff', color: '#6d28d9', border: '#ddd6fe' },
     { to: '/lookup', label: 'Lookup Learner', bg: '#e0f2fe', color: '#0369a1', border: '#bae6fd' },
     { to: '/reports', label: 'Attendance Reports', bg: '#fff7ed', color: '#c2410c', border: '#fed7aa' },
     { to: '/visitors', label: 'Visitors', bg: '#eef2ff', color: '#4338ca', border: '#c7d2fe' },

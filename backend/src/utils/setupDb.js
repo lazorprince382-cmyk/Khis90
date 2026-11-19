@@ -36,6 +36,7 @@ async function setupDatabase() {
   const migrationV5Path = path.join(__dirname, '../../../database/migration_v5.sql');
   const migrationV6Path = path.join(__dirname, '../../../database/migration_v6.sql');
   const migrationV7Path = path.join(__dirname, '../../../database/migration_v7.sql');
+  const stationTrackingMigrationPath = path.join(__dirname, '../../../database/migration_v5_station_tracking.sql');
 
   try {
     await pool.connect();
@@ -48,7 +49,7 @@ async function setupDatabase() {
       console.log('Base schema already exists, skipping.');
     }
 
-    for (const mig of [migrationPath, migrationV3Path, migrationV4Path, migrationV5Path, migrationV6Path, migrationV7Path]) {
+    for (const mig of [migrationPath, migrationV3Path, migrationV4Path, migrationV5Path, migrationV6Path, migrationV7Path, stationTrackingMigrationPath]) {
       if (fs.existsSync(mig)) {
         await pool.query(fs.readFileSync(mig, 'utf8'));
         console.log(`Migration applied: ${path.basename(mig)}`);

@@ -6,9 +6,17 @@ const { authenticate, authorize } = require('../middleware/auth');
 module.exports = (io) => {
   router.post('/', authenticate, (req, res, next) => {
     const type = req.body.scan_type;
+    const permMap = {
+      gate_in: 'scan_gate', gate_out: 'scan_gate',
+      lunch: 'scan_lunch', meal_break: 'scan_lunch', meal_lunch: 'scan_lunch', meal_supper: 'scan_lunch',
+      library_in: 'scan_library', library_out: 'scan_library',
+      dormitory_in: 'scan_dormitory', dormitory_out: 'scan_dormitory',
+    };
     const pathMap = {
       gate_in: '/scan/gate', gate_out: '/scan/gate',
-      lunch: '/scan/lunch', library_in: '/scan/library', library_out: '/scan/library',
+      lunch: '/scan/lunch', meal_break: '/scan/lunch', meal_lunch: '/scan/lunch', meal_supper: '/scan/lunch',
+      library_in: '/scan/library', library_out: '/scan/library',
+      dormitory_in: '/scan/dormitory', dormitory_out: '/scan/dormitory',
     };
     const path = pathMap[type];
     const access = req.user?.dashboard_access || [];

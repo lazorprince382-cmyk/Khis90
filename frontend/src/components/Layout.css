@@ -78,6 +78,15 @@
   height: 20px;
   flex-shrink: 0;
 }
+.sidebar-nav-group { margin-bottom: 0.85rem; }
+.sidebar-nav-heading {
+  color: #9ca3af;
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  padding: .35rem .9rem .3rem;
+  text-transform: uppercase;
+}
 
 .sidebar-link:hover {
   background: var(--kis-maroon-light);

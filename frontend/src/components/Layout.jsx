@@ -8,7 +8,7 @@ import logo from '../assets/logo.png';
 import {
   IconDashboard, IconUserPlus, IconUpload, IconSearch, IconGate, IconLunch,
   IconLibrary, IconVisitors, IconStaff, IconReports, IconSettings, IconBell,
-  IconCard,
+  IconCard, IconOffice,
 } from './Icons';
 import './Layout.css';
 
@@ -21,22 +21,24 @@ const IconMessages = () => (
 );
 
 const ALL_NAV = [
-  { to: '/', label: 'Dashboard', Icon: IconDashboard, roles: ['*'] },
-  { to: '/register', label: 'Register Learner', Icon: IconUserPlus, roles: ['admin'] },
-  { to: '/bulk-import', label: 'Bulk Import', Icon: IconUpload, roles: ['admin'] },
-  { to: '/students', label: 'All Students', Icon: IconStaff, roles: ['admin'] },
-  { to: '/qr-codes', label: 'QR Codes', Icon: IconCard, roles: ['admin'] },
-  { to: '/lookup', label: 'Learner Lookup', Icon: IconSearch, roles: ['*'] },
-  { to: '/scan/gate', label: 'Gate Scan', Icon: IconGate, roles: ['admin', 'security'] },
-  { to: '/scan/lunch', label: 'Lunch Scan', Icon: IconLunch, roles: ['admin', 'security', 'cafeteria'] },
-  { to: '/staff', label: 'Staff', Icon: IconStaff, roles: ['admin', 'security'] },
-  { to: '/scan/library', label: 'Library Scan', Icon: IconLibrary, roles: ['admin', 'librarian'] },
-  { to: '/visitors', label: 'Visitors', Icon: IconVisitors, roles: ['admin', 'security'] },
-  { to: '/reports', label: 'Reports', Icon: IconReports, roles: ['admin'] },
-  { to: '/settings', label: 'Settings', Icon: IconSettings, roles: ['admin'] },
-  { to: '/notifications', label: 'Notifications', Icon: IconBell, roles: ['*'] },
-  { to: '/messages', label: 'Messages', Icon: IconMessages, roles: ['*'] },
-  { to: '/offices', label: 'Manage Accounts', Icon: IconSettings, roles: ['admin'] },
+  { to: '/', label: 'Dashboard', Icon: IconDashboard, roles: ['*'], section: 'Overview' },
+  { to: '/lookup', label: 'Learner Movement', Icon: IconSearch, roles: ['*'], section: 'Overview' },
+  { to: '/scan/gate', label: 'Gate Attendance', Icon: IconGate, roles: ['admin', 'security'], section: 'Scan stations' },
+  { to: '/scan/library', label: 'Library In / Out', Icon: IconLibrary, roles: ['admin', 'librarian'], section: 'Scan stations' },
+  { to: '/scan/lunch', label: 'Meals: Break / Lunch / Supper', Icon: IconLunch, roles: ['admin', 'security', 'cafeteria'], section: 'Scan stations' },
+  { to: '/scan/dormitory', label: 'Dormitory In / Out', Icon: IconGate, roles: ['admin', 'security', 'boarding'], section: 'Scan stations' },
+  { to: '/reports', label: 'Reports', Icon: IconReports, roles: ['admin'], section: 'Reporting' },
+  { to: '/office-dashboard', label: 'Office Dashboard', Icon: IconOffice, roles: ['admin', 'office_manager'], section: 'Reporting' },
+  { to: '/students', label: 'All Learners', Icon: IconStaff, roles: ['admin'], section: 'Administration' },
+  { to: '/register', label: 'Register Learner', Icon: IconUserPlus, roles: ['admin'], section: 'Administration' },
+  { to: '/bulk-import', label: 'Bulk Import', Icon: IconUpload, roles: ['admin'], section: 'Administration' },
+  { to: '/qr-codes', label: 'QR Codes', Icon: IconCard, roles: ['admin'], section: 'Administration' },
+  { to: '/staff', label: 'Staff', Icon: IconStaff, roles: ['admin', 'security'], section: 'Administration' },
+  { to: '/visitors', label: 'Visitors', Icon: IconVisitors, roles: ['admin', 'security'], section: 'Administration' },
+  { to: '/offices', label: 'Manage Offices', Icon: IconSettings, roles: ['admin'], section: 'Administration' },
+  { to: '/notifications', label: 'Notifications', Icon: IconBell, roles: ['*'], section: 'System' },
+  { to: '/messages', label: 'Messages', Icon: IconMessages, roles: ['*'], section: 'System' },
+  { to: '/settings', label: 'Settings', Icon: IconSettings, roles: ['admin'], section: 'System' },
 ];
 
 export default function Layout() {
@@ -150,22 +152,20 @@ export default function Layout() {
           </div>
         </div>
         <nav className="sidebar-nav">
-          {navItems.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              onMouseEnter={() => preloadRoute(to)}
-              onFocus={() => preloadRoute(to)}
-              onClick={() => { if (window.innerWidth <= 900) setSidebarOpen(false); }}
-              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-            >
-              <Icon />
-              <span>{label}</span>
-              {to === '/notifications' && unreadCount > 0 && <span className="sidebar-badge">{unreadCount}</span>}
-              {to === '/messages' && messageUnreadCount > 0 && <span className="sidebar-badge message-badge">{messageUnreadCount}</span>}
-            </NavLink>
-          ))}
+          {['Overview', 'Scan stations', 'Reporting', 'Administration', 'System'].map((section) => {
+            const items = navItems.filter((item) => item.section === section);
+            if (!items.length) return null;
+            return <div className="sidebar-nav-group" key={section}>
+              <div className="sidebar-nav-heading">{section}</div>
+              {items.map(({ to, label, Icon }) => (
+                <NavLink key={to} to={to} end={to === '/'} onMouseEnter={() => preloadRoute(to)} onFocus={() => preloadRoute(to)} onClick={() => { if (window.innerWidth <= 900) setSidebarOpen(false); }} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+                  <Icon /><span>{label}</span>
+                  {to === '/notifications' && unreadCount > 0 && <span className="sidebar-badge">{unreadCount}</span>}
+                  {to === '/messages' && messageUnreadCount > 0 && <span className="sidebar-badge message-badge">{messageUnreadCount}</span>}
+                </NavLink>
+              ))}
+            </div>;
+          })}
         </nav>
         <div className="sidebar-term-card">
           <div className="term-label">Academic Year</div>

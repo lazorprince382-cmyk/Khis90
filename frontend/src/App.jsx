@@ -15,6 +15,7 @@ const LearnerLookup = lazy(pageLoaders.lookup);
 const ScanGate = lazy(pageLoaders.scanGate);
 const ScanLunch = lazy(pageLoaders.scanLunch);
 const ScanLibrary = lazy(pageLoaders.scanLibrary);
+const ScanDormitory = lazy(pageLoaders.scanDormitory);
 const Notifications = lazy(pageLoaders.notifications);
 const Settings = lazy(pageLoaders.settings);
 const Reports = lazy(pageLoaders.reports);
@@ -47,6 +48,7 @@ export default function App() {
           <Route path="scan/gate" element={<ProtectedRoute path="/scan/gate"><ScanGate /></ProtectedRoute>} />
           <Route path="scan/lunch" element={<ProtectedRoute path="/scan/lunch"><ScanLunch /></ProtectedRoute>} />
           <Route path="scan/library" element={<ProtectedRoute path="/scan/library"><ScanLibrary /></ProtectedRoute>} />
+          <Route path="scan/dormitory" element={<ProtectedRoute path="/scan/dormitory"><ScanDormitory /></ProtectedRoute>} />
           <Route path="notifications" element={<ProtectedRoute path="/notifications"><Notifications /></ProtectedRoute>} />
           <Route path="settings" element={<ProtectedRoute path="/settings"><Settings /></ProtectedRoute>} />
           <Route path="reports" element={<ProtectedRoute path="/reports"><Reports /></ProtectedRoute>} />
